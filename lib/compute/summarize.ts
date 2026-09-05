@@ -1,9 +1,4 @@
-import type { AnomalyFlag } from "./types";
-
-export interface StreakInfo {
-  length: number;
-  direction: "up" | "down";
-}
+import type { AnomalyFlag, StreakInfo } from "./types";
 
 /**
  * Longest run of consecutive increases or decreases ending at the last value

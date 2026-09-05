@@ -1,3 +1,5 @@
+import type { DirectionMeta } from "./types";
+
 /** Thousands-grouped numeral, e.g. 1204 -> "1,204". */
 export function groupDigits(n: number): string {
   return n.toLocaleString("en-US");
@@ -8,10 +10,13 @@ export function formatPercent(fraction: number, decimals = 1): string {
   return `${(fraction * 100).toFixed(decimals)}%`;
 }
 
-export interface DirectionMeta {
-  icon: "up" | "down" | "flat";
-  color: "positive" | "negative" | "neutral";
-  word: string;
+/** Assumes a single currency ($) per the MVP's UK/US-locale assumption (see PLAN.md). */
+export function formatCurrency(value: number): string {
+  const sign = value < 0 ? "-" : "";
+  return `${sign}$${Math.abs(value).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
 }
 
 /** Redundant coding (icon + color + word) for a change, so direction is never conveyed by color alone. */

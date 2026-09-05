@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { describeFraction, directionMeta, formatPercent, groupDigits } from "./format";
+import { describeFraction, directionMeta, formatCurrency, formatPercent, groupDigits } from "./format";
 
 describe("groupDigits", () => {
   it("adds thousands separators", () => {
@@ -13,6 +13,17 @@ describe("formatPercent", () => {
   it("formats a fraction as a percent string", () => {
     expect(formatPercent(0.193)).toBe("19.3%");
     expect(formatPercent(0.5, 0)).toBe("50%");
+  });
+});
+
+describe("formatCurrency", () => {
+  it("formats a dollar amount with two decimal places", () => {
+    expect(formatCurrency(4500)).toBe("$4,500.00");
+    expect(formatCurrency(1204.5)).toBe("$1,204.50");
+  });
+
+  it("puts the minus sign before the symbol for negative amounts", () => {
+    expect(formatCurrency(-50)).toBe("-$50.00");
   });
 });
 
