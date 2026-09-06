@@ -1,13 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { ExecSummary } from "@/components/numbers/ExecSummary";
 import { NumberCard } from "@/components/numbers/NumberCard";
 import { PasteOrUploadTable } from "@/components/upload/PasteOrUploadTable";
 import type { InterpretErrorResponse, InterpretResponse } from "@/app/api/interpret/route";
-import type { NumberCardData, ParseError } from "@/lib/compute/types";
+import type { ExecSummaryData, NumberCardData, ParseError } from "@/lib/compute/types";
 
 export function InterpretView() {
   const [cards, setCards] = useState<NumberCardData[] | null>(null);
+  const [execSummary, setExecSummary] = useState<ExecSummaryData | null>(null);
   const [error, setError] = useState<ParseError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -23,12 +25,15 @@ export function InterpretView() {
       const data = (await res.json()) as InterpretResponse | InterpretErrorResponse;
       if (data.ok) {
         setCards(data.cards);
+        setExecSummary(data.execSummary);
       } else {
         setCards(null);
+        setExecSummary(null);
         setError(data.error);
       }
     } catch {
       setCards(null);
+      setExecSummary(null);
       setError({ message: "Something went wrong reaching the server. Please try again." });
     } finally {
       setIsLoading(false);
@@ -62,6 +67,7 @@ export function InterpretView() {
 
       {cards && cards.length > 0 && (
         <div className="flex flex-col gap-4">
+          {execSummary && <ExecSummary summary={execSummary} />}
           {cards.map((card) => (
             <NumberCard key={card.name} card={card} />
           ))}

@@ -1,10 +1,12 @@
 import { buildNumberCards } from "@/lib/compute/build-number-cards";
 import { parseDelimitedText } from "@/lib/compute/parse-table";
-import type { NumberCardData, ParseError } from "@/lib/compute/types";
+import { buildExecSummary } from "@/lib/compute/summarize";
+import type { ExecSummaryData, NumberCardData, ParseError } from "@/lib/compute/types";
 
 export interface InterpretResponse {
   ok: true;
   cards: NumberCardData[];
+  execSummary: ExecSummaryData | null;
 }
 
 export interface InterpretErrorResponse {
@@ -44,5 +46,6 @@ export async function POST(request: Request): Promise<Response> {
   }
 
   const cards = buildNumberCards(parsed.table);
-  return Response.json({ ok: true, cards } satisfies InterpretResponse);
+  const execSummary = buildExecSummary(cards, parsed.table.rows.length);
+  return Response.json({ ok: true, cards, execSummary } satisfies InterpretResponse);
 }

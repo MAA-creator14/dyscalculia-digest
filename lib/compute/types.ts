@@ -55,6 +55,27 @@ export interface StreakInfo {
   direction: "up" | "down";
 }
 
+export interface ExecSummaryStreak {
+  cardName: string;
+  streak: StreakInfo;
+}
+
+export interface ExecSummaryAnomaly {
+  cardName: string;
+  anomaly: AnomalyFlag;
+}
+
+/** Deterministic selection of what's noteworthy across a whole dataset (see PLAN.md Flow B).
+ * `headline` and `movers` reuse each card's already-composed `sentence` — the selection
+ * picks *which* cards are noteworthy, it never invents new wording. */
+export interface ExecSummaryData {
+  headline: string;
+  movers: string[];
+  streak: ExecSummaryStreak | null;
+  worstAnomaly: ExecSummaryAnomaly | null;
+  dataQualityCaveats: string[];
+}
+
 /** Everything a NumberCard needs to render one metric column: raw + formatted values,
  * the deterministic sentence, redundant direction coding, and any anomalies/streak. */
 export interface NumberCardData {
