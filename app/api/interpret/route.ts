@@ -1,4 +1,5 @@
 import { buildNumberCards } from "@/lib/compute/build-number-cards";
+import { derivePeriodLabels } from "@/lib/compute/format";
 import { parseDelimitedText } from "@/lib/compute/parse-table";
 import { buildExecSummary } from "@/lib/compute/summarize";
 import type { ExecSummaryData, NumberCardData, ParseError } from "@/lib/compute/types";
@@ -7,6 +8,7 @@ export interface InterpretResponse {
   ok: true;
   cards: NumberCardData[];
   execSummary: ExecSummaryData | null;
+  periodLabels: string[] | null;
 }
 
 export interface InterpretErrorResponse {
@@ -47,5 +49,6 @@ export async function POST(request: Request): Promise<Response> {
 
   const cards = buildNumberCards(parsed.table);
   const execSummary = buildExecSummary(cards, parsed.table.rows.length);
-  return Response.json({ ok: true, cards, execSummary } satisfies InterpretResponse);
+  const periodLabels = derivePeriodLabels(parsed.table);
+  return Response.json({ ok: true, cards, execSummary, periodLabels } satisfies InterpretResponse);
 }

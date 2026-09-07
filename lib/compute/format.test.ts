@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { describeFraction, directionMeta, formatCurrency, formatPercent, groupDigits } from "./format";
+import {
+  derivePeriodLabels,
+  describeFraction,
+  directionMeta,
+  formatCurrency,
+  formatPercent,
+  groupDigits,
+} from "./format";
+import type { ParsedTable } from "./types";
 
 describe("groupDigits", () => {
   it("adds thousands separators", () => {
@@ -54,5 +62,29 @@ describe("describeFraction", () => {
   it("describes changes of 100% or more as multiples", () => {
     expect(describeFraction(1.0)).toBe("about double");
     expect(describeFraction(2.0)).toBe("about triple");
+  });
+});
+
+describe("derivePeriodLabels", () => {
+  it("returns ISO date strings from the first date column", () => {
+    const table: ParsedTable = {
+      columns: [
+        { name: "Week", type: "date" },
+        { name: "Signups", type: "count" },
+      ],
+      rows: [
+        { Week: new Date("2024-01-01T00:00:00Z"), Signups: 100 },
+        { Week: new Date("2024-01-08T00:00:00Z"), Signups: 90 },
+      ],
+    };
+    expect(derivePeriodLabels(table)).toEqual(["2024-01-01", "2024-01-08"]);
+  });
+
+  it("returns null when there is no date column", () => {
+    const table: ParsedTable = {
+      columns: [{ name: "Signups", type: "count" }],
+      rows: [{ Signups: 100 }],
+    };
+    expect(derivePeriodLabels(table)).toBeNull();
   });
 });

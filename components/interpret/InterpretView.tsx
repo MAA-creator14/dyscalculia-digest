@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FollowUpChat } from "@/components/chat/FollowUpChat";
 import { ExecSummary } from "@/components/numbers/ExecSummary";
 import { NumberCard } from "@/components/numbers/NumberCard";
 import { PasteOrUploadTable } from "@/components/upload/PasteOrUploadTable";
@@ -10,8 +11,10 @@ import type { ExecSummaryData, NumberCardData, ParseError } from "@/lib/compute/
 export function InterpretView() {
   const [cards, setCards] = useState<NumberCardData[] | null>(null);
   const [execSummary, setExecSummary] = useState<ExecSummaryData | null>(null);
+  const [periodLabels, setPeriodLabels] = useState<string[] | null>(null);
   const [error, setError] = useState<ParseError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [datasetVersion, setDatasetVersion] = useState(0);
 
   async function handleSubmit(text: string) {
     setIsLoading(true);
@@ -26,14 +29,18 @@ export function InterpretView() {
       if (data.ok) {
         setCards(data.cards);
         setExecSummary(data.execSummary);
+        setPeriodLabels(data.periodLabels);
+        setDatasetVersion((v) => v + 1);
       } else {
         setCards(null);
         setExecSummary(null);
+        setPeriodLabels(null);
         setError(data.error);
       }
     } catch {
       setCards(null);
       setExecSummary(null);
+      setPeriodLabels(null);
       setError({ message: "Something went wrong reaching the server. Please try again." });
     } finally {
       setIsLoading(false);
@@ -71,6 +78,12 @@ export function InterpretView() {
           {cards.map((card) => (
             <NumberCard key={card.name} card={card} />
           ))}
+          <FollowUpChat
+            key={datasetVersion}
+            cards={cards}
+            execSummary={execSummary}
+            periodLabels={periodLabels}
+          />
         </div>
       )}
     </div>

@@ -1,4 +1,4 @@
-import type { DirectionMeta } from "./types";
+import type { DirectionMeta, ParsedTable } from "./types";
 
 /** Thousands-grouped numeral, e.g. 1204 -> "1,204". */
 export function groupDigits(n: number): string {
@@ -84,4 +84,20 @@ export function describeFraction(percent: number): string {
 
   const roundedPercent = Math.round(value * 20) * 5; // nearest 5%
   return `roughly ${roundedPercent}%`;
+}
+
+/**
+ * Per-row labels from the table's first date column (e.g. "2024-01-08" for each
+ * week), so the chat tools (see PLAN.md Flow C) can name a specific period instead
+ * of just an index. Null when the table has no date column — callers fall back to
+ * "period N" rather than guessing a label.
+ */
+export function derivePeriodLabels(table: ParsedTable): string[] | null {
+  const dateColumn = table.columns.find((column) => column.type === "date");
+  if (!dateColumn) return null;
+
+  return table.rows.map((row) => {
+    const value = row[dateColumn.name];
+    return value instanceof Date ? value.toISOString().slice(0, 10) : String(value);
+  });
 }
