@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FollowUpChat } from "@/components/chat/FollowUpChat";
 import { ExecSummary } from "@/components/numbers/ExecSummary";
 import { NumberCard } from "@/components/numbers/NumberCard";
+import { SharePanel } from "@/components/share/SharePanel";
 import { PasteOrUploadTable } from "@/components/upload/PasteOrUploadTable";
 import type { InterpretErrorResponse, InterpretResponse } from "@/app/api/interpret/route";
 import type { ExecSummaryData, NumberCardData, ParseError } from "@/lib/compute/types";
@@ -80,6 +81,12 @@ export function InterpretView() {
           ))}
           <FollowUpChat
             key={datasetVersion}
+            cards={cards}
+            execSummary={execSummary}
+            periodLabels={periodLabels}
+          />
+          <SharePanel
+            key={`share-${datasetVersion}`}
             cards={cards}
             execSummary={execSummary}
             periodLabels={periodLabels}
