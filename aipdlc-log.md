@@ -71,3 +71,13 @@ Evidence trail of AI-proposed work and human gate decisions for this project. Ap
 **Proposed:** implementation plan — 7 scoped changes (currency symbol fix, dataset-shape + API field, suggestion rules, panel + click-to-ask with useChat lifted, ratings in Neon, glossary section, own-data example); plan file ~/.claude/plans/sequential-greeting-thimble.md
 **Decision:** Approved
 **Notes:** approved via ExitPlanMode; key calls — server-side shape guard, glossary as in-page <details>, ratings in a hand-DDL'd Neon table (user runs the DDL), verify useChat id-reset before lifting it
+
+## 2026-09-21T14:43:17Z — Item: ask-the-right-questions — Stage: Build/Implement
+**Proposed:** PR #1 (feature/ask-the-right-questions) opened for human review — 7 scoped changes + log commit, 146 tests, tsc/eslint clean at head
+**Decision:** Approved
+**Notes:** PR opened by the user (gh CLI unavailable to Claude) and merged by the user into main as fc6cf52 — merged before Verify/Test, so verification below is post-merge. Not yet verified at merge time: browser pass (Chrome extension was disconnected); suggestion_feedback DDL not yet run against Neon
+
+## 2026-09-21T14:45:21Z — Item: ask-the-right-questions — Stage: Verify/Test
+**Proposed:** 146/146 tests pass, tsc/eslint clean on merged main; acceptance criteria for Stories 0, 5, 6 and most of 1, 3, 4 verified by unit/route tests and a live curl of /api/interpret and the rendered glossary
+**Decision:** Approved
+**Notes:** accepted with KNOWN GAPS still owed by the user — Story 2 (click-to-ask sends into chat, tool-backed answer, keyboard/screen-reader), Story 4 AC4 (keyboard/focus on <details>), Story 3 AC1/AC3 against a real DB (suggestion_feedback DDL not yet run) and fail-soft in a browser; also dark mode / phone width. Verified post-merge (PR merged before this stage). Stage 8 (Release/Operate) not started
