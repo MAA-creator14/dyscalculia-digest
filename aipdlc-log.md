@@ -51,3 +51,18 @@ Evidence trail of AI-proposed work and human gate decisions for this project. Ap
 **Proposed:** 4 directions (A. suggested-questions panel, B. conversational Metrics Coach, C. connect real data, D. glossary + worked example) — see specs/outputs/solution-directions-ask-the-right-questions-2026-09-21.md
 **Decision:** Approved — combined A + D
 **Notes:** B (strongest differentiator hit) and C (re-opens a deferred roadmap decision) not chosen for now; item stops here per user's original scope (Research + Discover/Ideate only) — Plan/Spec not started
+
+## 2026-09-21T13:21:06Z — Item: ask-the-right-questions — Stage: Plan/Spec
+**Proposed:** PRD + 6 user stories for combined A + D (suggested-questions panel, metrics glossary with own-data worked example) — see specs/outputs/prd-ask-the-right-questions-2026-09-21.md and user-stories-ask-the-right-questions-2026-09-21.md
+**Decision:** Approved
+**Notes:** B and C recorded as non-goals; code constraints found (dataset only in React state, no Flow E, coarse ColumnType so no retention/cohort detection) shaped scope; success-metric targets left as placeholders pending Prototype
+
+## 2026-09-21T13:44:08Z — Item: ask-the-right-questions — Stage: Prototype
+**Proposed:** system-model prototype — real parser/cards/chat tools run against 16 sample datasets, v0 (spec as written) vs v1 (shape guard) — https://claude.ai/artifact/LwW6NYuuB8tasVykZvz5XQ
+**Decision:** Edited
+**Notes:** spec needs revising — LOOP BACK TO Plan/Spec (resume there, not at Prototype). Findings: v0 trend rule gave 4 wrong suggestions on 2 datasets (v1 guard: 0); 2/9 legit period datasets silent (month-name/ambiguous dates); own-data glossary hit on 3/15 datasets, retention 0/2; text columns never reach client; flat-series vacuous suggestion; 0 tool errors across 36 suggestions. Samples are hand-built, not real user data
+
+## 2026-09-21T13:49:08Z — Item: ask-the-right-questions — Stage: Plan/Spec (rev 2, after Prototype)
+**Proposed:** revised PRD + 7 stories (new Story 0: API returns dataset shape + all column names; trend rules gated on periodsTrustworthy; flat-series gate; glossary re-centred on definition + data-needed, own-data example optional) — see prd-ask-the-right-questions-2026-09-21.md and user-stories-ask-the-right-questions-2026-09-21.md
+**Decision:** Approved
+**Notes:** decided at this gate — keep Story 5 (own-data example) as an optional bonus; fix formatCurrency (£ shown as $) first as a prerequisite to Story 5. Month-name date parsing and other Flow A issues remain non-goals. Success-metric coverage targets still placeholders pending real PM datasets
