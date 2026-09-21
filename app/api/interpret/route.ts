@@ -1,4 +1,5 @@
 import { buildNumberCards } from "@/lib/compute/build-number-cards";
+import { assessDatasetShape, type DatasetShape } from "@/lib/compute/dataset-shape";
 import { derivePeriodLabels } from "@/lib/compute/format";
 import { parseDelimitedText } from "@/lib/compute/parse-table";
 import { buildExecSummary } from "@/lib/compute/summarize";
@@ -9,6 +10,8 @@ export interface InterpretResponse {
   cards: NumberCardData[];
   execSummary: ExecSummaryData | null;
   periodLabels: string[] | null;
+  /** Table shape for suggestions/glossary gating: column names+types and whether rows are trustworthy periods. No cell values. */
+  shape: DatasetShape;
 }
 
 export interface InterpretErrorResponse {
@@ -50,5 +53,6 @@ export async function POST(request: Request): Promise<Response> {
   const cards = buildNumberCards(parsed.table);
   const execSummary = buildExecSummary(cards, parsed.table.rows.length);
   const periodLabels = derivePeriodLabels(parsed.table);
-  return Response.json({ ok: true, cards, execSummary, periodLabels } satisfies InterpretResponse);
+  const shape = assessDatasetShape(parsed.table);
+  return Response.json({ ok: true, cards, execSummary, periodLabels, shape } satisfies InterpretResponse);
 }
