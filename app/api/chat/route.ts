@@ -20,6 +20,10 @@ separated from anything about this specific dataset.
 If a question can't be answered with the available tools, say so plainly rather than guessing or
 computing a new number yourself.`;
 
+function log(level: "info" | "error", event: string, fields: Record<string, unknown>): void {
+  console[level](JSON.stringify({ event, ...fields }));
+}
+
 interface ChatRequestBody {
   messages: UIMessage[];
   cards?: NumberCardData[];
@@ -33,6 +37,7 @@ interface ChatRequestBody {
  * already-computed `cards`/`execSummary` the client sent along with the message.
  */
 export async function POST(request: Request): Promise<Response> {
+  const startedAt = Date.now();
   const body = (await request.json()) as ChatRequestBody;
 
   const dataset: ChatDataset = {
@@ -41,12 +46,32 @@ export async function POST(request: Request): Promise<Response> {
     periodLabels: body.periodLabels ?? null,
   };
 
+  // Log metadata only — never message text or dataset figures.
+  log("info", "chat.request", {
+    messageCount: body.messages.length,
+    cardCount: dataset.cards.length,
+    hasExecSummary: dataset.execSummary !== null,
+  });
+
   const result = streamText({
     model: CHAT_MODEL,
     instructions: INSTRUCTIONS,
     tools: buildChatTools(dataset),
     stopWhen: isStepCount(5),
     messages: await convertToModelMessages(body.messages),
+    onEnd: ({ finishReason, totalUsage, steps }) =>
+      log("info", "chat.finish", {
+        finishReason,
+        steps: steps.length,
+        inputTokens: totalUsage.inputTokens,
+        outputTokens: totalUsage.outputTokens,
+        durationMs: Date.now() - startedAt,
+      }),
+    onError: ({ error }) =>
+      log("error", "chat.error", {
+        message: error instanceof Error ? error.message : String(error),
+        durationMs: Date.now() - startedAt,
+      }),
   });
 
   return result.toUIMessageStreamResponse();
