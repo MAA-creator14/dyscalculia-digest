@@ -2,14 +2,14 @@ import { detectAnomalies } from "./anomalies";
 import { describeFraction, directionMeta, formatCurrency, formatPercent, groupDigits } from "./format";
 import { computeDelta } from "./metrics";
 import { detectStreak } from "./summarize";
-import type { ColumnType, Delta, NumberCardData, ParsedTable } from "./types";
+import type { Column, ColumnType, Delta, NumberCardData, ParsedTable } from "./types";
 
 const METRIC_TYPES: ColumnType[] = ["count", "currency", "percent", "ratio"];
 
-function formatValue(type: ColumnType, value: number): string {
-  switch (type) {
+function formatValue(column: Column, value: number): string {
+  switch (column.type) {
     case "currency":
-      return formatCurrency(value);
+      return formatCurrency(value, column.currencySymbol);
     case "percent":
       return formatPercent(value);
     default:
@@ -63,8 +63,8 @@ export function buildNumberCards(table: ParsedTable): NumberCardData[] {
     const first = values[0];
     const last = values[values.length - 1];
     const delta = computeDelta(first, last);
-    const formattedFirst = formatValue(column.type, first);
-    const formattedLast = formatValue(column.type, last);
+    const formattedFirst = formatValue(column, first);
+    const formattedLast = formatValue(column, last);
 
     cards.push({
       name: column.name,

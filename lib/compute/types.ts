@@ -2,9 +2,13 @@ export type ColumnType = "date" | "percent" | "currency" | "count" | "ratio" | "
 
 export type CellValue = string | number | Date;
 
+export type CurrencySymbol = "£" | "$";
+
 export interface Column {
   name: string;
   type: ColumnType;
+  /** Only set on `currency` columns: the symbol the source data used, carried through so cards don't guess. */
+  currencySymbol?: CurrencySymbol;
 }
 
 export interface ParsedTable {

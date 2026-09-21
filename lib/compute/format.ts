@@ -1,4 +1,4 @@
-import type { DirectionMeta, ParsedTable } from "./types";
+import type { CurrencySymbol, DirectionMeta, ParsedTable } from "./types";
 
 /** Thousands-grouped numeral, e.g. 1204 -> "1,204". */
 export function groupDigits(n: number): string {
@@ -11,9 +11,9 @@ export function formatPercent(fraction: number, decimals = 1): string {
 }
 
 /** Assumes a single currency ($) per the MVP's UK/US-locale assumption (see PLAN.md). */
-export function formatCurrency(value: number): string {
+export function formatCurrency(value: number, symbol: CurrencySymbol = "$"): string {
   const sign = value < 0 ? "-" : "";
-  return `${sign}$${Math.abs(value).toLocaleString("en-US", {
+  return `${sign}${symbol}${Math.abs(value).toLocaleString("en-US", {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   })}`;

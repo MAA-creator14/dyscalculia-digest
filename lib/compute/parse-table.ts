@@ -1,4 +1,4 @@
-import type { CellValue, Column, ColumnType, ParseError, ParseResult } from "./types";
+import type { CellValue, Column, ColumnType, CurrencySymbol, ParseError, ParseResult } from "./types";
 
 type SlashConvention = "MDY" | "DMY";
 
@@ -77,8 +77,12 @@ interface RawCell {
 }
 
 type ColumnInferenceResult =
-  | { type: ColumnType; values: CellValue[] }
+  | { type: ColumnType; values: CellValue[]; currencySymbol?: CurrencySymbol }
   | { error: ParseError };
+
+function currencySymbolOf(raw: string): CurrencySymbol {
+  return raw.trim().replace(/^-/, "")[0] as CurrencySymbol;
+}
 
 function inferAndParseColumn(columnName: string, cells: RawCell[]): ColumnInferenceResult {
   const nonEmpty = cells.filter((c) => c.raw.trim() !== "");
@@ -121,8 +125,21 @@ function inferAndParseColumn(columnName: string, cells: RawCell[]): ColumnInfere
   }
 
   if (nonEmpty.every((c) => isCurrency(c.raw.trim()))) {
+    const symbol = currencySymbolOf(nonEmpty[0].raw);
+    const mixed = nonEmpty.find((c) => currencySymbolOf(c.raw) !== symbol);
+    if (mixed) {
+      return {
+        error: {
+          message: `Column "${columnName}" mixes currency symbols (${symbol} and ${currencySymbolOf(mixed.raw)}); row ${mixed.rowIndex + 2} has "${mixed.raw}". Use one currency per column.`,
+          columnName,
+          rowIndex: mixed.rowIndex,
+          rawValue: mixed.raw,
+        },
+      };
+    }
     return {
       type: "currency",
+      currencySymbol: symbol,
       values: cells.map((c) => (c.raw.trim() === "" ? "" : parseCurrency(c.raw.trim()))),
     };
   }
@@ -236,7 +253,9 @@ export function parseDelimitedText(input: string): ParseResult {
     if ("error" in result) {
       return { ok: false, error: result.error };
     }
-    columns.push({ name, type: result.type });
+    columns.push(
+      result.currencySymbol ? { name, type: result.type, currencySymbol: result.currencySymbol } : { name, type: result.type },
+    );
     columnValues.push(result.values);
   }
 
