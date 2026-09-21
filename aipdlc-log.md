@@ -36,3 +36,18 @@ Evidence trail of AI-proposed work and human gate decisions for this project. Ap
 **Proposed:** 92/92 tests pass, lint/typecheck clean, all 9 acceptance criteria across Stories 1-3 verified end-to-end (browser + curl) against the real Neon database
 **Decision:** Approved
 **Notes:** ready for the user to merge feature/share-flow-g into main themselves — not done automatically. Stage 6 (Release/Operate) not started — no deploy target confirmed
+
+## 2026-09-21T12:46:28Z — Item: ask-the-right-questions — Stage: Research
+**Proposed:** Synthesis — already on PLAN.md's Phase 3 roadmap; market gap confirmed (data-literacy coaching exists only as generic courses, never embedded in a PM's own data); feasibility split (explaining concepts has existing scaffolding in Flow C, "what data should I collect" is genuinely new with a different risk profile than numeric hallucination); no interview evidence yet for this specific pain
+**Decision:** Approved
+**Notes:** —
+
+## 2026-09-21T12:48:45Z — Item: ask-the-right-questions — Stage: Discover/Ideate — Problem framing
+**Proposed:** Two-sided gap — PMs can't interrogate data they have (don't know what to ask) or identify what data they'd need to answer a question they do have; generic courses teach concepts abstractly, disconnected from the PM's own numbers; why now — Flow A/B/C already give a real compute layer and a "general concept" chat pattern to extend
+**Decision:** Approved
+**Notes:** —
+
+## 2026-09-21T12:58:09Z — Item: ask-the-right-questions — Stage: Discover/Ideate — Solution direction
+**Proposed:** 4 directions (A. suggested-questions panel, B. conversational Metrics Coach, C. connect real data, D. glossary + worked example) — see specs/outputs/solution-directions-ask-the-right-questions-2026-09-21.md
+**Decision:** Approved — combined A + D
+**Notes:** B (strongest differentiator hit) and C (re-opens a deferred roadmap decision) not chosen for now; item stops here per user's original scope (Research + Discover/Ideate only) — Plan/Spec not started
