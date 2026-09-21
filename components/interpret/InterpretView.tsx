@@ -1,21 +1,54 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { FollowUpChat } from "@/components/chat/FollowUpChat";
+import { GlossarySection } from "@/components/glossary/GlossarySection";
+import { SuggestedQuestions } from "@/components/interpret/SuggestedQuestions";
 import { ExecSummary } from "@/components/numbers/ExecSummary";
 import { NumberCard } from "@/components/numbers/NumberCard";
 import { SharePanel } from "@/components/share/SharePanel";
 import { PasteOrUploadTable } from "@/components/upload/PasteOrUploadTable";
 import type { InterpretErrorResponse, InterpretResponse } from "@/app/api/interpret/route";
+import type { DatasetShape } from "@/lib/compute/dataset-shape";
+import { suggestQuestions, type SuggestedQuestion } from "@/lib/compute/suggest-questions";
 import type { ExecSummaryData, NumberCardData, ParseError } from "@/lib/compute/types";
+
+const chatTransport = new DefaultChatTransport({ api: "/api/chat" });
 
 export function InterpretView() {
   const [cards, setCards] = useState<NumberCardData[] | null>(null);
   const [execSummary, setExecSummary] = useState<ExecSummaryData | null>(null);
   const [periodLabels, setPeriodLabels] = useState<string[] | null>(null);
+  const [shape, setShape] = useState<DatasetShape | null>(null);
   const [error, setError] = useState<ParseError | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [datasetVersion, setDatasetVersion] = useState(0);
+  const chatSectionRef = useRef<HTMLDivElement>(null);
+
+  // The chat lives here (not inside FollowUpChat) so a suggested question can send into it.
+  // A new `id` per dataset gives a fresh conversation, replacing the old key={datasetVersion} remount.
+  const { messages, sendMessage, status } = useChat({
+    id: `dataset-${datasetVersion}`,
+    transport: chatTransport,
+  });
+
+  const suggestions = useMemo(
+    () => (cards && shape ? suggestQuestions(cards, shape) : []),
+    [cards, shape],
+  );
+
+  function ask(text: string) {
+    sendMessage({ text }, { body: { cards, execSummary, periodLabels } });
+  }
+
+  function askSuggestion(question: SuggestedQuestion) {
+    ask(question.text);
+    // The chat sits below the cards; bring the answer into view without a jarring jump for users who opt out of motion.
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    chatSectionRef.current?.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
+  }
 
   async function handleSubmit(text: string) {
     setIsLoading(true);
@@ -31,17 +64,20 @@ export function InterpretView() {
         setCards(data.cards);
         setExecSummary(data.execSummary);
         setPeriodLabels(data.periodLabels);
+        setShape(data.shape);
         setDatasetVersion((v) => v + 1);
       } else {
         setCards(null);
         setExecSummary(null);
         setPeriodLabels(null);
+        setShape(null);
         setError(data.error);
       }
     } catch {
       setCards(null);
       setExecSummary(null);
       setPeriodLabels(null);
+      setShape(null);
       setError({ message: "Something went wrong reaching the server. Please try again." });
     } finally {
       setIsLoading(false);
@@ -76,15 +112,13 @@ export function InterpretView() {
       {cards && cards.length > 0 && (
         <div className="flex flex-col gap-4">
           {execSummary && <ExecSummary summary={execSummary} />}
+          <SuggestedQuestions key={datasetVersion} suggestions={suggestions} disabled={status !== "ready"} onAsk={askSuggestion} />
           {cards.map((card) => (
             <NumberCard key={card.name} card={card} />
           ))}
-          <FollowUpChat
-            key={datasetVersion}
-            cards={cards}
-            execSummary={execSummary}
-            periodLabels={periodLabels}
-          />
+          <div ref={chatSectionRef}>
+            <FollowUpChat messages={messages} status={status} onAsk={ask} />
+          </div>
           <SharePanel
             key={`share-${datasetVersion}`}
             cards={cards}
@@ -93,6 +127,8 @@ export function InterpretView() {
           />
         </div>
       )}
+
+      <GlossarySection cards={cards} shape={shape} />
     </div>
   );
 }

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useChat } from "@ai-sdk/react";
-import { DefaultChatTransport, isToolUIPart, getToolName } from "ai";
-import type { ExecSummaryData, NumberCardData } from "@/lib/compute/types";
+import { isToolUIPart, getToolName, type ChatStatus, type UIMessage } from "ai";
 
 /**
  * Chat input under the restated table (see PLAN.md Flow C). The model answers
@@ -11,25 +9,25 @@ import type { ExecSummaryData, NumberCardData } from "@/lib/compute/types";
  * `cards`/`execSummary` — it never sees raw numbers as free text it could
  * misremember or recompute. Tool calls are shown as a small "Looked up" note so
  * a dataset-grounded answer is visibly distinguished from general knowledge.
+ *
+ * Chat state lives in InterpretView (so a suggested question elsewhere on the
+ * page can send into the same conversation); this component only renders it.
  */
 export function FollowUpChat({
-  cards,
-  execSummary,
-  periodLabels,
+  messages,
+  status,
+  onAsk,
 }: {
-  cards: NumberCardData[];
-  execSummary: ExecSummaryData | null;
-  periodLabels: string[] | null;
+  messages: UIMessage[];
+  status: ChatStatus;
+  onAsk: (text: string) => void;
 }) {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
-  });
 
   function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!input.trim()) return;
-    sendMessage({ text: input }, { body: { cards, execSummary, periodLabels } });
+    onAsk(input);
     setInput("");
   }
 
