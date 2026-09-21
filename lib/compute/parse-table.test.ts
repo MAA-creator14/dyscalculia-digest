@@ -16,7 +16,7 @@ describe("parseDelimitedText", () => {
     expect(result.table.columns).toEqual([
       { name: "Week", type: "count" },
       { name: "Signups", type: "count" },
-      { name: "Revenue", type: "currency" },
+      { name: "Revenue", type: "currency", currencySymbol: "$" },
       { name: "Growth", type: "percent" },
       { name: "ConversionRate", type: "ratio" },
     ]);
@@ -118,5 +118,30 @@ describe("parseDelimitedText", () => {
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.table.rows[0].Name).toBe("Acme, Inc.");
+  });
+});
+
+describe("parseDelimitedText currency symbols", () => {
+  it("records the symbol the data used", () => {
+    const result = parseDelimitedText(["Week,Revenue", "1,£4500", "2,£5200.50"].join("\n"));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.table.columns[1]).toEqual({ name: "Revenue", type: "currency", currencySymbol: "£" });
+  });
+
+  it("reads the symbol through a leading minus sign", () => {
+    const result = parseDelimitedText(["Week,Profit", "1,-£1200", "2,£300"].join("\n"));
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.table.columns[1].currencySymbol).toBe("£");
+  });
+
+  it("fails loudly, with the row, when a column mixes £ and $", () => {
+    const result = parseDelimitedText(["Week,Revenue", "1,£4500", "2,$5200"].join("\n"));
+    expect(result.ok).toBe(false);
+    if (result.ok) return;
+    expect(result.error.columnName).toBe("Revenue");
+    expect(result.error.rowIndex).toBe(1);
+    expect(result.error.message).toContain("mixes currency symbols");
   });
 });

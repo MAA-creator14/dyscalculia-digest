@@ -33,6 +33,12 @@ describe("formatCurrency", () => {
   it("puts the minus sign before the symbol for negative amounts", () => {
     expect(formatCurrency(-50)).toBe("-$50.00");
   });
+
+  it("uses the given symbol, defaulting to $", () => {
+    expect(formatCurrency(4500, "£")).toBe("£4,500.00");
+    expect(formatCurrency(-50, "£")).toBe("-£50.00");
+    expect(formatCurrency(4500)).toBe("$4,500.00");
+  });
 });
 
 describe("directionMeta", () => {

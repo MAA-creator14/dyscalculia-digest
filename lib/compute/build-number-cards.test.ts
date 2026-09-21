@@ -74,6 +74,15 @@ describe("buildNumberCards", () => {
     expect(growth.formattedFirst).toBe("10.0%");
   });
 
+  it("keeps a £ column as £ on the card", () => {
+    const table = parseOrThrow(["Week,Revenue", "1,£4500.00", "2,£5200.00"].join("\n"));
+    const revenue = byName(buildNumberCards(table), "Revenue");
+    expect(revenue.formattedFirst).toBe("£4,500.00");
+    expect(revenue.formattedLast).toBe("£5,200.00");
+    expect(revenue.sentence).toContain("£4,500.00");
+    expect(revenue.sentence).not.toContain("$");
+  });
+
   it("surfaces anomalies and streaks on the card", () => {
     const table = parseOrThrow(
       [
