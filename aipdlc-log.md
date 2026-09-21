@@ -66,3 +66,8 @@ Evidence trail of AI-proposed work and human gate decisions for this project. Ap
 **Proposed:** revised PRD + 7 stories (new Story 0: API returns dataset shape + all column names; trend rules gated on periodsTrustworthy; flat-series gate; glossary re-centred on definition + data-needed, own-data example optional) — see prd-ask-the-right-questions-2026-09-21.md and user-stories-ask-the-right-questions-2026-09-21.md
 **Decision:** Approved
 **Notes:** decided at this gate — keep Story 5 (own-data example) as an optional bonus; fix formatCurrency (£ shown as $) first as a prerequisite to Story 5. Month-name date parsing and other Flow A issues remain non-goals. Success-metric coverage targets still placeholders pending real PM datasets
+
+## 2026-09-21T14:20:14Z — Item: ask-the-right-questions — Stage: Architect/Design
+**Proposed:** implementation plan — 7 scoped changes (currency symbol fix, dataset-shape + API field, suggestion rules, panel + click-to-ask with useChat lifted, ratings in Neon, glossary section, own-data example); plan file ~/.claude/plans/sequential-greeting-thimble.md
+**Decision:** Approved
+**Notes:** approved via ExitPlanMode; key calls — server-side shape guard, glossary as in-page <details>, ratings in a hand-DDL'd Neon table (user runs the DDL), verify useChat id-reset before lifting it
