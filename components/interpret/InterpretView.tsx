@@ -7,7 +7,6 @@ import { DefaultChatTransport } from "ai";
 import { FollowUpChat } from "@/components/chat/FollowUpChat";
 import { GlossarySection } from "@/components/glossary/GlossarySection";
 import { ConsentGate } from "@/components/interpret/ConsentGate";
-import { DataModeBadge } from "@/components/interpret/DataModeBadge";
 import { SuggestedQuestions } from "@/components/interpret/SuggestedQuestions";
 import { ExecSummary } from "@/components/numbers/ExecSummary";
 import { NumberCard } from "@/components/numbers/NumberCard";
@@ -79,12 +78,10 @@ export function InterpretView({ scenario }: { scenario?: Scenario }) {
   }
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
-      <DataModeBadge mode={isPractice ? "practice" : "own"} />
-
-      {scenario ? (
+    <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-6">
+      {scenario && (
         <div className="flex flex-col gap-3">
-          <h1 className="text-2xl font-bold">{scenario.title}</h1>
+          <h2 className="text-xl font-bold">{scenario.title}</h2>
           <p className="text-foreground/80">{scenario.role}</p>
           <p className="text-foreground/80">{scenario.situation}</p>
           <div className="rounded-lg border border-border bg-surface p-4">
@@ -93,18 +90,6 @@ export function InterpretView({ scenario }: { scenario?: Scenario }) {
           </div>
           <Link href="/practice" className="w-fit text-sm text-foreground/70 underline">
             Choose a different scenario
-          </Link>
-        </div>
-      ) : (
-        <div>
-          <h1 className="text-2xl font-bold">Restate your own table</h1>
-          <p className="mt-1 text-foreground/70">
-            Paste a metrics table or spreadsheet export and get each number back with a
-            plain-language explanation, a redundant up/down indicator, and the exact figure —
-            side by side.
-          </p>
-          <Link href="/practice" className="mt-2 inline-block text-sm text-foreground/70 underline">
-            Not ready to use real numbers? Try a practice scenario
           </Link>
         </div>
       )}

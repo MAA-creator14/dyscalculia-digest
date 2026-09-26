@@ -1,3 +1,4 @@
+import { DataScreen } from "@/components/interpret/DataScreen";
 import { InterpretView } from "@/components/interpret/InterpretView";
 
 export const metadata = {
@@ -5,5 +6,9 @@ export const metadata = {
 };
 
 export default function InterpretPage() {
-  return <InterpretView />;
+  return (
+    <DataScreen mode="own">
+      <InterpretView />
+    </DataScreen>
+  );
 }
