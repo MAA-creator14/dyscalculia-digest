@@ -26,6 +26,11 @@ export function PasteOrUploadTable({ onSubmit }: { onSubmit: (text: string) => v
       }}
       className="flex flex-col gap-3"
     >
+      <p className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-foreground/80">
+        <span aria-hidden="true">🔒</span> Worked out in your browser — your table is never sent
+        anywhere. Nothing leaves this device unless you turn on AI questions or create a share link,
+        and each tells you exactly what it sends first.
+      </p>
       <label htmlFor="table-input" className="text-sm font-medium text-foreground/80">
         Paste a table (from a spreadsheet or dashboard export), or upload a CSV
       </label>
@@ -60,11 +65,6 @@ export function PasteOrUploadTable({ onSubmit }: { onSubmit: (text: string) => v
           Restate this data
         </button>
       </div>
-      <p className="text-xs text-foreground/50">
-        Your table is worked out in this browser and never sent anywhere. Nothing leaves this
-        device unless you choose to turn on AI questions or create a share link — each tells
-        you exactly what it sends first.
-      </p>
     </form>
   );
 }
