@@ -28,7 +28,7 @@ The product-philosophy reference point is Spotify, not for its brand (don't reus
 - **Standard, highly legible numeral typography — not a niche "dyscalculia font."** Tabular figures on a well-tested system/UI face (e.g. Inter, system-ui) where digits are easy to tell apart (3/8/6 don't blur together), large default type size with a user-adjustable size control. Evidence for dedicated dyscalculia-specific fonts is thin; a proven, freely available face is the lower-risk choice.
 - **Redundant coding for direction/magnitude:** icon **+** color **+** word together, never color or a symbol alone (no bare `+`/`-` or `<`/`>` as the only cue).
 - **Raw number and plain-language framing shown together, always, at equal visual weight** (e.g. "+19.3%" and "about a fifth higher" side by side) — maximizes trust and verifiability; the tool never hides the exact figure behind the friendly framing.
-- **Never require mental math** — pre-compute and show the answer; an inline calculator covers ad hoc comparisons.
+- **Never require mental math** — pre-compute and show the answer wherever two numbers need comparing.
 - **Simple, redundant-coded visuals are allowed, traditional charts are not the primary vehicle.** A small sparkline or bar may sit alongside a NumberCard to reinforce the words/numbers, but direction and magnitude must always be readable from the icon+color+word+sentence alone — no chart is ever the *only* way information is conveyed, since reading axes/slopes is itself a common dyscalculia pain point.
 - **Deliberate, disable-able motion.** Small count-up/transition animations for feedback (Spotify-style polish), but never the *only* cue for direction/magnitude, and off by default for users sensitive to motion.
 - **Audio as a first-class action, not an afterthought.** A "listen" control on every NumberCard (see Text-to-speech below) — treat "hear this metric" the way Spotify treats "play this track."
@@ -56,8 +56,8 @@ On first use, a single open, qualitative question — *"how would you describe y
 **Flow C — Ask a follow-up question**
 7. Chat input under the restated table ("which week had the biggest drop?"). The LLM answers dataset-specific questions using tool calls that return precomputed values — it never recomputes or invents a number about the dataset — and may also explain general data-literacy concepts (e.g. "what does retention mean") using its general knowledge, clearly and visibly distinguished from dataset-specific figures.
 
-**Flow D — Inline calculator**
-8. Anywhere a user might need to mentally compare two numbers, the UI shows the computed answer inline; a persistent small calculator widget covers ad hoc comparisons.
+**Flow D — Inline comparisons**
+8. Anywhere a user might need to mentally compare two numbers, the UI shows the computed answer inline. (A persistent ad hoc calculator widget was built and later removed.)
 
 **Flow E — Session recall**
 9. Recent interpretations list (computed summaries only, not raw source data) so users can return without re-uploading.
@@ -118,7 +118,6 @@ components/
   numbers/NumberCard.tsx             # numeral+icon+color+word+comparative sentence+optional sparkline+listen button
   numbers/ExecSummary.tsx            # headline+top movers+streak+worst anomaly+listen+copy-as-text
   numbers/AnomalyPanel.tsx
-  numbers/InlineCalculator.tsx
   numbers/TrendBadge.tsx
   audio/ListenButton.tsx             # per-card "play narration" control
   audio/AudioPlayer.tsx              # shared playback UI/state
