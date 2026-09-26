@@ -3,17 +3,10 @@
 import { useRef, useState } from "react";
 
 /**
- * Paste or upload a CSV/TSV table. Nothing here is persisted server-side —
- * per PLAN.md's privacy stance, the raw text only ever leaves the browser to
- * be computed on, not stored.
+ * Paste or upload a CSV/TSV table. The raw text never leaves the browser: it's
+ * computed on locally by lib/compute/interpret.ts (see PLAN.md's privacy stance).
  */
-export function PasteOrUploadTable({
-  onSubmit,
-  isLoading,
-}: {
-  onSubmit: (text: string) => void;
-  isLoading: boolean;
-}) {
+export function PasteOrUploadTable({ onSubmit }: { onSubmit: (text: string) => void }) {
   const [text, setText] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -61,15 +54,16 @@ export function PasteOrUploadTable({
         />
         <button
           type="submit"
-          disabled={isLoading || text.trim() === ""}
+          disabled={text.trim() === ""}
           className="rounded-lg bg-positive px-4 py-2 text-sm font-semibold text-background disabled:opacity-50"
         >
-          {isLoading ? "Working it out…" : "Restate this data"}
+          Restate this data
         </button>
       </div>
       <p className="text-xs text-foreground/50">
-        This data is never stored or used to train models — it&apos;s only used to compute the
-        result below.
+        Your table is worked out in this browser and never sent anywhere. Nothing leaves this
+        device unless you choose to turn on AI questions or create a share link — each tells
+        you exactly what it sends first.
       </p>
     </form>
   );

@@ -8,3 +8,15 @@ create table if not exists suggestion_feedback (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Self-serve test feedback. scenario_id is null for feedback given on the user's own data; the
+-- row never holds dataset content — only whether the check was answered correctly, a 1–5
+-- confidence rating, and an optional free-text comment the user typed.
+create table if not exists scenario_feedback (
+  event_id uuid primary key,
+  scenario_id text,
+  answered_correctly boolean,
+  confidence smallint check (confidence between 1 and 5),
+  comment text,
+  created_at timestamptz not null default now()
+);

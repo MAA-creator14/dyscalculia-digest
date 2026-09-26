@@ -2,7 +2,7 @@ import { z } from "zod";
 
 /**
  * Deliberate exception to this codebase's usual manual `unknown`-cast narrowing
- * (see app/api/interpret/route.ts, app/api/chat/route.ts): this is the first route
+ * (see app/api/chat/route.ts): this is the first route
  * where externally-supplied JSON becomes *persisted* data, and the PRD's top
  * assertion — "the serialized payload's keys are exactly the defined summary
  * fields, never raw data" — needs real allow-list enforcement. zod's default
