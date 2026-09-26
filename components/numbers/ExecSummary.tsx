@@ -28,12 +28,13 @@ function toPlainText(summary: ExecSummaryData): string {
  * composed sentence or a plainly-templated fact — this component never phrases
  * anything itself, it only lays out what `buildExecSummary` already selected.
  */
-export function ExecSummary({ summary }: { summary: ExecSummaryData }) {
+export function ExecSummary({ summary, copyPrefix }: { summary: ExecSummaryData; copyPrefix?: string }) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
     try {
-      await navigator.clipboard.writeText(toPlainText(summary));
+      const text = toPlainText(summary);
+      await navigator.clipboard.writeText(copyPrefix ? `${copyPrefix}\n${text}` : text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {

@@ -1,34 +1,52 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { FollowUpChat } from "@/components/chat/FollowUpChat";
 import { GlossarySection } from "@/components/glossary/GlossarySection";
+import { ConsentGate } from "@/components/interpret/ConsentGate";
+import { DataModeBadge } from "@/components/interpret/DataModeBadge";
 import { SuggestedQuestions } from "@/components/interpret/SuggestedQuestions";
 import { ExecSummary } from "@/components/numbers/ExecSummary";
 import { NumberCard } from "@/components/numbers/NumberCard";
+import { FeedbackForm } from "@/components/practice/FeedbackForm";
 import { SharePanel } from "@/components/share/SharePanel";
 import { PasteOrUploadTable } from "@/components/upload/PasteOrUploadTable";
-import type { InterpretErrorResponse, InterpretResponse } from "@/app/api/interpret/route";
-import type { DatasetShape } from "@/lib/compute/dataset-shape";
+import { interpretTable, type InterpretResult } from "@/lib/compute/interpret";
 import { suggestQuestions, type SuggestedQuestion } from "@/lib/compute/suggest-questions";
-import type { ExecSummaryData, NumberCardData, ParseError } from "@/lib/compute/types";
+import type { ParseError } from "@/lib/compute/types";
+import type { Scenario } from "@/lib/scenarios/scenarios";
 
 const chatTransport = new DefaultChatTransport({ api: "/api/chat" });
 
-export function InterpretView() {
-  const [cards, setCards] = useState<NumberCardData[] | null>(null);
-  const [execSummary, setExecSummary] = useState<ExecSummaryData | null>(null);
-  const [periodLabels, setPeriodLabels] = useState<string[] | null>(null);
-  const [shape, setShape] = useState<DatasetShape | null>(null);
+/**
+ * With a `scenario`, this is practice mode: the scenario's made-up table is interpreted
+ * immediately and AI questions are on (nothing sensitive to protect). Without one, it's the
+ * user's own data: everything is computed in the browser, and AI questions and sharing each
+ * need an explicit opt-in, per dataset, that says exactly what leaves the device.
+ */
+export function InterpretView({ scenario }: { scenario?: Scenario }) {
+  const isPractice = scenario !== undefined;
+  const [result, setResult] = useState<InterpretResult | null>(() => {
+    if (!scenario) return null;
+    const initial = interpretTable(scenario.csv);
+    return initial.ok ? initial : null;
+  });
   const [error, setError] = useState<ParseError | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [datasetVersion, setDatasetVersion] = useState(0);
+  const [aiEnabled, setAiEnabled] = useState(isPractice);
+  const [shareEnabled, setShareEnabled] = useState(false);
   const chatSectionRef = useRef<HTMLDivElement>(null);
 
+  const cards = result?.cards ?? null;
+  const execSummary = result?.execSummary ?? null;
+  const periodLabels = result?.periodLabels ?? null;
+  const shape = result?.shape ?? null;
+
   // The chat lives here (not inside FollowUpChat) so a suggested question can send into it.
-  // A new `id` per dataset gives a fresh conversation, replacing the old key={datasetVersion} remount.
+  // A new `id` per dataset gives a fresh conversation.
   const { messages, sendMessage, status } = useChat({
     id: `dataset-${datasetVersion}`,
     transport: chatTransport,
@@ -50,52 +68,48 @@ export function InterpretView() {
     chatSectionRef.current?.scrollIntoView({ block: "nearest", behavior: reduceMotion ? "auto" : "smooth" });
   }
 
-  async function handleSubmit(text: string) {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const res = await fetch("/api/interpret", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
-      });
-      const data = (await res.json()) as InterpretResponse | InterpretErrorResponse;
-      if (data.ok) {
-        setCards(data.cards);
-        setExecSummary(data.execSummary);
-        setPeriodLabels(data.periodLabels);
-        setShape(data.shape);
-        setDatasetVersion((v) => v + 1);
-      } else {
-        setCards(null);
-        setExecSummary(null);
-        setPeriodLabels(null);
-        setShape(null);
-        setError(data.error);
-      }
-    } catch {
-      setCards(null);
-      setExecSummary(null);
-      setPeriodLabels(null);
-      setShape(null);
-      setError({ message: "Something went wrong reaching the server. Please try again." });
-    } finally {
-      setIsLoading(false);
-    }
+  function handleSubmit(text: string) {
+    const next = interpretTable(text);
+    setResult(next.ok ? next : null);
+    setError(next.ok ? null : next.error);
+    setDatasetVersion((v) => v + 1);
+    // Consent is per dataset: a new table means asking again before anything is sent.
+    setAiEnabled(false);
+    setShareEnabled(false);
   }
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 px-4 py-10">
-      <div>
-        <h1 className="text-2xl font-bold">Restate a table</h1>
-        <p className="mt-1 text-foreground/70">
-          Paste a metrics table or spreadsheet export and get each number back with a
-          plain-language explanation, a redundant up/down indicator, and the exact figure —
-          side by side.
-        </p>
-      </div>
+      <DataModeBadge mode={isPractice ? "practice" : "own"} />
 
-      <PasteOrUploadTable onSubmit={handleSubmit} isLoading={isLoading} />
+      {scenario ? (
+        <div className="flex flex-col gap-3">
+          <h1 className="text-2xl font-bold">{scenario.title}</h1>
+          <p className="text-foreground/80">{scenario.role}</p>
+          <p className="text-foreground/80">{scenario.situation}</p>
+          <div className="rounded-lg border border-border bg-surface p-4">
+            <p className="text-sm font-semibold text-foreground/60">Your task</p>
+            <p className="mt-1 font-medium text-foreground">{scenario.task}</p>
+          </div>
+          <Link href="/practice" className="w-fit text-sm text-foreground/70 underline">
+            Choose a different scenario
+          </Link>
+        </div>
+      ) : (
+        <div>
+          <h1 className="text-2xl font-bold">Restate your own table</h1>
+          <p className="mt-1 text-foreground/70">
+            Paste a metrics table or spreadsheet export and get each number back with a
+            plain-language explanation, a redundant up/down indicator, and the exact figure —
+            side by side.
+          </p>
+          <Link href="/practice" className="mt-2 inline-block text-sm text-foreground/70 underline">
+            Not ready to use real numbers? Try a practice scenario
+          </Link>
+        </div>
+      )}
+
+      {!isPractice && <PasteOrUploadTable onSubmit={handleSubmit} />}
 
       {error && (
         <div className="rounded-lg border border-negative/30 bg-negative/5 p-4 text-sm text-negative">
@@ -111,20 +125,44 @@ export function InterpretView() {
 
       {cards && cards.length > 0 && (
         <div className="flex flex-col gap-4">
-          {execSummary && <ExecSummary summary={execSummary} />}
-          <SuggestedQuestions key={datasetVersion} suggestions={suggestions} disabled={status !== "ready"} onAsk={askSuggestion} />
+          {execSummary && (
+            <ExecSummary summary={execSummary} copyPrefix={isPractice ? "[Practice data — not real numbers]" : undefined} />
+          )}
+          {/* Suggestions send into the chat, so they only appear once AI questions are on. */}
+          {aiEnabled && (
+            <SuggestedQuestions key={datasetVersion} suggestions={suggestions} disabled={status !== "ready"} onAsk={askSuggestion} />
+          )}
           {cards.map((card) => (
             <NumberCard key={card.name} card={card} />
           ))}
-          <div ref={chatSectionRef}>
-            <FollowUpChat messages={messages} status={status} onAsk={ask} />
-          </div>
-          <SharePanel
-            key={`share-${datasetVersion}`}
-            cards={cards}
-            execSummary={execSummary}
-            periodLabels={periodLabels}
-          />
+          <ConsentGate
+            title="Ask questions about this data"
+            description="Uses an AI model (Anthropic, via Vercel AI Gateway). Turning this on sends your metric names, the calculated figures shown above, and the questions you ask. Your original table is never sent."
+            actionLabel="Turn on AI questions"
+            granted={aiEnabled}
+            onGrant={() => setAiEnabled(true)}
+          >
+            <div ref={chatSectionRef}>
+              <FollowUpChat messages={messages} status={status} onAsk={ask} />
+            </div>
+          </ConsentGate>
+          {!isPractice && (
+            <ConsentGate
+              title="Share with a colleague"
+              description="Creates a read-only link. Turning this on and creating a link stores the calculated figures shown above and any note you add on our server until you revoke the link. Your original table is never stored."
+              actionLabel="Set up a share link"
+              granted={shareEnabled}
+              onGrant={() => setShareEnabled(true)}
+            >
+              <SharePanel
+                key={`share-${datasetVersion}`}
+                cards={cards}
+                execSummary={execSummary}
+                periodLabels={periodLabels}
+              />
+            </ConsentGate>
+          )}
+          <FeedbackForm key={`feedback-${datasetVersion}`} scenario={scenario} />
         </div>
       )}
 

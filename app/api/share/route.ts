@@ -17,7 +17,7 @@ export interface ShareErrorResponse {
  * app/share/[token]/page.tsx calling lib/share/db.ts directly, so a reader's
  * browser makes zero requests beyond the initial page HTML (see PRD §"How It
  * Works"). Follows the same `{ ok: true, ... } | { ok: false, error }`
- * convention as app/api/interpret/route.ts.
+ * convention as app/api/suggestion-feedback/route.ts.
  */
 export async function POST(request: Request): Promise<Response> {
   let body: unknown;
