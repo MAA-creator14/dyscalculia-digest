@@ -8,6 +8,10 @@
   --positive: #15803d;
   --negative: #b91c1c;
   --neutral: #52525b;
+  /* Hook / Line / Sinker section accents. Deliberately not green/red — those mean up/down only. */
+  --hook: #1d4ed8;
+  --line: #7e22ce;
+  --sinker: #b45309;
 }
 
 @theme inline {
@@ -18,6 +22,9 @@
   --color-positive: var(--positive);
   --color-negative: var(--negative);
   --color-neutral: var(--neutral);
+  --color-hook: var(--hook);
+  --color-line: var(--line);
+  --color-sinker: var(--sinker);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -32,6 +39,9 @@
     --positive: #4ade80;
     --negative: #f87171;
     --neutral: #a1a1aa;
+    --hook: #60a5fa;
+    --line: #c084fc;
+    --sinker: #fbbf24;
   }
 }
 
@@ -44,4 +54,47 @@ body {
 /* Tabular figures so digits stay aligned and easy to tell apart (3/8/6 don't blur together). */
 .font-numeral {
   font-variant-numeric: tabular-nums;
+}
+
+/* Story slides (components/story/StoryDeck.tsx). Printing shows only the print copy of the deck,
+   one slide per landscape page, in light colours whatever the screen theme. */
+.story-print {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 12mm;
+  }
+
+  body.story-printing > *:not(.story-print),
+  body.story-printing dialog {
+    display: none !important;
+  }
+
+  body.story-printing .story-print {
+    display: block;
+    --background: #ffffff;
+    --foreground: #171717;
+    --surface: #f4f4f5;
+    --border: #e4e4e7;
+    --positive: #15803d;
+    --negative: #b91c1c;
+    --neutral: #52525b;
+    --hook: #1d4ed8;
+    --line: #7e22ce;
+    --sinker: #b45309;
+    background: #ffffff;
+    color: #171717;
+  }
+
+  .story-print .story-slide {
+    break-after: page;
+    min-height: 0;
+  }
+
+  .story-print .story-slide:last-child {
+    break-after: auto;
+  }
 }

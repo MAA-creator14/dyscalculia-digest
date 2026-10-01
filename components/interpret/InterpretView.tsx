@@ -12,6 +12,7 @@ import { ExecSummary } from "@/components/numbers/ExecSummary";
 import { NumberCard } from "@/components/numbers/NumberCard";
 import { FeedbackForm } from "@/components/practice/FeedbackForm";
 import { SharePanel } from "@/components/share/SharePanel";
+import { StoryEntry } from "@/components/story/StoryEntry";
 import { PasteOrUploadTable } from "@/components/upload/PasteOrUploadTable";
 import { interpretTable, type InterpretResult } from "@/lib/compute/interpret";
 import { suggestQuestions, type SuggestedQuestion } from "@/lib/compute/suggest-questions";
@@ -113,6 +114,7 @@ export function InterpretView({ scenario }: { scenario?: Scenario }) {
           {execSummary && (
             <ExecSummary summary={execSummary} copyPrefix={isPractice ? "[Practice data — not real numbers]" : undefined} />
           )}
+          {result && <StoryEntry result={result} scenarioId={scenario?.id} />}
           {/* Suggestions send into the chat, so they only appear once AI questions are on. */}
           {aiEnabled && (
             <SuggestedQuestions key={datasetVersion} suggestions={suggestions} disabled={status !== "ready"} onAsk={askSuggestion} />

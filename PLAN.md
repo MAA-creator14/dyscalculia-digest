@@ -68,6 +68,30 @@ On first use, a single open, qualitative question — *"how would you describe y
 **Flow G — Share**
 11. A "share" action generates a read-only link to one interpretation (the computed summary only, never raw source data) that a colleague can open without an account — a simple, always-valid, hard-to-guess link, with a manual "revoke" action available. No automatic expiry for MVP.
 
+**Flow H — Tell the story (Hook / Line / Sinker)**
+12. **Entry points:** "Tell the story with these numbers" on the interpret screen, or `/story` directly. Practice uses `/practice/[id]/story`.
+13. **Guided questions:** eight questions, one per screen.
+    - Audience.
+    - The ask.
+    - Tag each metric as leading, lagging or not sure. A name-based suggestion (`lib/story/indicators.ts`) is shown as "Suggested — you decide".
+    - One lagging outcome, which becomes the **Hook**.
+    - 1–3 leading drivers, which become the **Line**.
+    - "We think…" hypothesis.
+    - What happens if nothing changes.
+    - The one thing to remember, which becomes the **Sinker**.
+14. **Story text:** `lib/story/compose.ts` builds it deterministically from the cards' own sentences and figures plus the PM's words. `lib/story/checks.ts` adds calm, non-blocking notes:
+    - A driver moved the opposite way to the outcome.
+    - The outcome has an anomaly.
+    - The rows aren't trustworthy periods.
+    - Correlation isn't causation.
+15. **Optional "Improve with AI"** (`/api/story/polish`), one section at a time:
+    - It sends only that section's text and the audience. It is consent-gated per draft for own data.
+    - Any rewrite whose numbers differ from the original is thrown away server-side (`lib/story/numbers.ts`).
+    - The PM always accepts or discards a suggestion. It is never applied automatically.
+16. **Drafts:** saved only in this browser's localStorage, as computed figures and answers, never the raw table. The PM can delete a draft at any time.
+17. **Presenting:** three in-app slides with ←/→ and Esc. The Line slide has sparklines beside the exact figures. Print / Save as PDF gives one slide per page.
+18. **Section colours:** blue, violet and amber, never green or red, which stay reserved for up/down.
+
 **No auth for the first demoable slice** (paste → restate, ephemeral). Add auth (Clerk via Vercel Marketplace) only once Google Sheets OAuth or session recall requires it.
 
 **Usage pattern:** this is designed as an **occasional utility** PMs reach for when they specifically need to make sense of a tricky dataset — not a daily-habit product. No engagement loops (streaks, notifications, daily digests) are needed; the design goal is to be excellent in the moment it's needed, not to maximize return visits.
