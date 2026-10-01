@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import { ConsentGate } from "@/components/interpret/ConsentGate";
 import type { StoryCheck } from "@/lib/story/checks";
+import { withSectionText } from "@/lib/story/compose";
 import type { PolishResponse } from "@/lib/story/polish";
 import { SECTION_KINDS, type Audience, type SectionKind, type StorySection } from "@/lib/story/types";
 import { BUTTON, PRIMARY, SECTION_META } from "./sections";
@@ -45,8 +46,7 @@ export function StoryPreview({
   const baseId = useId();
 
   function setText(kind: SectionKind, text: string) {
-    const section = sections[kind];
-    onSectionsChange({ ...sections, [kind]: { ...section, text, edited: text !== section.template } });
+    onSectionsChange(withSectionText(sections, kind, text));
   }
 
   async function polish(kind: SectionKind) {

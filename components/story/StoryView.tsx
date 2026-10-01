@@ -189,9 +189,11 @@ export function StoryView({ scenario }: { scenario?: Scenario }) {
                 open={presenting}
                 onClose={() => setPresenting(false)}
                 sections={draft.sections}
+                onSectionsChange={(sections) => update(() => ({ sections }))}
                 outcome={outcome}
                 drivers={drivers}
                 isPractice={isPractice}
+                title={scenario ? `Practice story - ${scenario.title}` : `Data story - ${outcome?.name ?? "my numbers"}`}
               />
             </>
           )}

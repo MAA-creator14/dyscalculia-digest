@@ -114,3 +114,13 @@ export function updateSections(
   }
   return next;
 }
+
+/** Sets one section's text, tracking whether it still matches the template ("Reset" shows when it doesn't). */
+export function withSectionText(
+  sections: Record<SectionKind, StorySection>,
+  kind: SectionKind,
+  text: string,
+): Record<SectionKind, StorySection> {
+  const section = sections[kind];
+  return { ...sections, [kind]: { ...section, text, edited: text !== section.template } };
+}

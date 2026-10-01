@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { interpretTable } from "@/lib/compute/interpret";
 import { getScenario } from "@/lib/scenarios/scenarios";
 import { extractNumberTokens } from "./numbers";
-import { asSentence, composeStory, suggestRemember, updateSections } from "./compose";
+import { asSentence, composeStory, suggestRemember, updateSections, withSectionText } from "./compose";
 import { emptyAnswers, type StoryAnswers } from "./types";
 
 function cardsFor(id: string) {
@@ -84,5 +84,14 @@ describe("updateSections", () => {
     const next = updateSections(edited, { hook: "h2", line: "l2", sinker: "s2" });
     expect(next.hook).toEqual({ kind: "hook", template: "h2", text: "my hook", edited: true });
     expect(next.line.text).toBe("l2");
+  });
+});
+
+describe("withSectionText", () => {
+  it("marks a section edited only while it differs from the template", () => {
+    const sections = updateSections(null, { hook: "h", line: "l", sinker: "s" });
+    const edited = withSectionText(sections, "hook", "mine");
+    expect(edited.hook).toMatchObject({ text: "mine", edited: true });
+    expect(withSectionText(edited, "hook", "h").hook.edited).toBe(false);
   });
 });
