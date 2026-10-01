@@ -9,12 +9,20 @@ import type { DataMode } from "./dataModes";
  * dashed border so even a cropped screenshot of practice numbers looks different from real data
  * (neutral, because green/red are reserved for up/down meaning — see PLAN.md).
  */
-export function DataScreen({ mode, children }: { mode: DataMode; children: ReactNode }) {
+export function DataScreen({
+  mode,
+  title = "Restate a table",
+  children,
+}: {
+  mode: DataMode;
+  title?: string;
+  children: ReactNode;
+}) {
   return (
     <>
       <DataModeBar mode={mode} />
       <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 px-4 pt-8">
-        <h1 className="text-2xl font-bold">Restate a table</h1>
+        <h1 className="text-2xl font-bold">{title}</h1>
         <DataModeSwitch mode={mode} />
       </div>
       <div

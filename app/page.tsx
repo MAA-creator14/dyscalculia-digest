@@ -36,6 +36,17 @@ export default function Home() {
           </span>
         </Link>
       </div>
+      <Link href="/story" className={DOOR}>
+        <span className="text-lg font-semibold">
+          <span aria-hidden="true">📖</span> Tell a data story
+        </span>
+        <span className="text-xs font-semibold uppercase tracking-wide text-foreground/70">Hook · Line · Sinker</span>
+        <span className="text-sm text-foreground/70">
+          Pick the one result that matters, the early signals that explain it, and what you need from
+          your audience — then present it as three slides. Works with your own data or a practice
+          scenario.
+        </span>
+      </Link>
     </div>
   );
 }
